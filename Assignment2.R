@@ -2,6 +2,7 @@ set.seed(1006274274);
 library(ggplot2)
 library(MASS)
 library(rcompanion)
+library(lmtest)
 
 
 
@@ -207,3 +208,50 @@ plot(modelForIQandScore)
 
 # The plot is definitely skewed towards the 0 on the x-axis.
 # Ask partner what this is supposed to mean?
+
+stanResiduals = rstandard(modelForIQandScore)
+
+
+qqnorm(stanResiduals,
+       ylab="Standardized Residuals", xlab="Normal Scores", main="QQ plot of residuals")
+qqline(stanResiduals)
+
+# This looks pretty accurate to what we would expect.
+
+shapiro.test(modelForIQandScore$residuals)
+
+# The p-value is 0.00217, which is < 0.05 (our alpha level), therefore we reject the null hypothesis that the data is normally distributed.
+
+bptest(modelForIQandScore)
+
+# For the breusch-pagan test, we test the errors in the regression.
+# Null hypothesis is that all the error variances are the same
+# Alternate hypothesis is that they're not the same.
+
+# p value < 0.05, therefore null hypothesis is true. Thus the errors have the same underlying variance.
+
+# So since the errors are not normally distributed, we must repeat step (d) and (e) with a boxcox transformation.
+
+#find optimal lambda for Box-Cox transformation
+bc <- boxcox(yAxis ~ xAxis)
+
+lambda = bc$x[which.max(bc$y)]
+
+#fit new linear regression model using the Box-Cox transformation
+new_model <- lm((yAxis^lambda) ~ xAxis)
+
+print("The shapiro-wilk test on the boxcox transformed model")
+shapiro.test(new_model$residuals)
+
+bptest(new_model)
+
+# Huh, the new p-value for the new_model is 0.3859, which is more than the alpha level :(
+
+
+
+stanResidualsPartF = rstandard(new_model)
+
+
+qqnorm(stanResidualsPartF,
+       ylab="Standardized Residuals", xlab="Normal Scores", main="QQ plot of residuals for Part F")
+qqline(stanResidualsPartF)
