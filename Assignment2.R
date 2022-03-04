@@ -1,0 +1,209 @@
+set.seed(1006274274);
+library(ggplot2)
+library(MASS)
+library(rcompanion)
+
+
+
+# TODO Question 1 A:
+myTable <- read.table("vote.txt", header = TRUE, sep = "", dec = ".")
+#
+# growthArr <-myTable$growth;
+# voteArr <- myTable$vote;
+#
+#
+# error =rnorm(length(growthArr),0,3.9);
+# fakeYData = vector()
+#
+# for (i in 1:length(growthArr)){
+#   fakeYData = append(fakeYData, 46.3 + 4* growthArr[i] + error[i])
+# }
+#
+# fakeDataModel = lm (fakeYData ~ growthArr)
+#
+# summary(fakeDataModel)
+# df = data.frame(growthArr = 0.1)
+#
+# predict(fakeDataModel,newdata = df)
+# #By default the prediction is 95%
+# predict(fakeDataModel, newdata = df, interval = "confidence")
+#
+#
+#
+#
+# # TODO Q1 part b
+#
+# generateFakeDataModel <- function (xVector){
+#
+#   error =rnorm(length(xVector),0,3.9);
+#   fakeYData = vector()
+#
+#   for (i in 1:length(xVector)){
+#     fakeYData = append(fakeYData, 46.3 + 4* xVector[i] + error[i])
+#   }
+#
+#   return ( lm (fakeYData ~ xVector))
+# }
+
+# interceptVector = vector()
+# slopeVector = vector()
+#
+# for (i in 1:10000){
+#   linModel <- generateFakeDataModel(growthArr);
+#   interceptVector = append(interceptVector, coef(linModel)["(Intercept)"])
+#   slopeVector = append (slopeVector, coef(linModel)["xVector"])
+# }
+#
+# plotNormalHistogram( unlist(interceptVector), prob = FALSE,
+#                      main = "Q1 part B: Intercept histogram",
+#                      length = 1000)
+#
+# plotNormalHistogram( unlist(slopeVector), prob = FALSE,
+#                      main = "Q1 part B: Slope histogram",
+#                      length = 1000)
+#
+#
+# data_frame = data.frame(growthArr = growthArr, fakeYData = fakeYData)
+#
+# cat ("The mean of the intercept vector is expected to be 4, and it is:", mean(interceptVector), "\n")
+# cat ("The mean of the slope vector is expected to be 4, and it is:", mean(slopeVector), "\n")
+#
+# # Yes, the simulated results are consistent with theoretical results.
+# sigmaHat = 3.9 #This is a given
+#
+# SXX <- sum((growthArr - mean(growthArr))^2)
+#
+# #Standard error of slope (beta 1 hat), should be the same as the sd of the slope vector
+# stanErrorBeta1 <- sigmaHat / sqrt(SXX)
+# stanErrorBeta1
+# sd(slopeVector)
+#
+# #Standard error of intercept (beta 0 hat), should be the same as the sd of the slope intercept
+#
+# stanErrorBeta0 <- sqrt(1 / length(growthArr) + (mean(growthArr)^2)/SXX) * sigmaHat
+# stanErrorBeta0
+# sd(interceptVector)
+#
+#
+# confidIntVector = vector()
+
+# TODO Q1 part c
+# df = data.frame(xVector = 0.1)
+#
+# total = 10000
+# expectedVal = 46.3 + (4 * 0.1)
+#
+# valCountInConfInt = 0
+# for (i in 1:total){
+#
+#
+#   currPrediction = predict(generateFakeDataModel(growthArr), newdata = df, interval = "confidence")
+#   # cat("curr prediction is ", currPrediction, "\n")
+#   # cat(currPrediction[[1]], "\n")
+#   if (currPrediction[[2]] <= expectedVal & expectedVal <= currPrediction[[3]]){
+#     valCountInConfInt = valCountInConfInt + 1
+#   }
+#   # confidIntVector = append (confidIntVector,fakeConfInt)
+# }
+#
+# cat ("Percentage of the expected val in the generated CIs:", valCountInConfInt / total, "\n")
+
+# This is absolutely consistent with the predicted values.
+
+# lm(y1~growthArr);
+# x <- c(0:9)
+# y <- c(98, 135, 162, 178, 221, 232, 283, 300, 374, 395)
+# par(mar=c(1,1,1,1))
+# fit <- lm (y~x)
+# result <- boxcox(fit, lambda = seq(-2,2,0.1))
+#
+# mylambda <- result$x[which.max(result$y)]
+
+
+# TODO Question 2
+#
+# myBoxCoxImpl <- function (yVec, xVec){
+#   lowestLambdaValSSE = .Machine$integer.max
+#   lowestLambdaVal = 0;
+#
+#
+#   wVec  = vector();
+#   for(lambda in seq(-2,2,0.1)){
+#     for (yVal in yVec){
+#       # print("lambda value:", str(lambda))
+#       k2 = (prod(yVec))^(1/length(yVec));
+#       if (lambda == 0){
+#         # print ("got into lambda = 0")
+#         wVec <-  append(wVec, k2* log(yVal))
+#       }else{
+#         k1 = 1/ (lambda * k2^(lambda-1))
+#         wVec <- append (wVec, k1 * ((yVal^lambda) -1))
+#       }
+#     }
+#     linModel <- lm(wVec~xVec)
+#     # print(summary(linModel));
+#     sse <- sum((fitted(linModel) - mean(wVec))^2)
+#
+#     if (sse < lowestLambdaValSSE){
+#       lowestLambdaValSSE = sse;
+#       lowestLambdaVal = lambda
+#     }
+#     # print(sse)
+#     wVec  = vector();
+#   }
+#   return (lowestLambdaVal);
+# }
+
+
+
+
+# myBoxCoxImpl(y,x)
+
+
+#TODO Question 3
+
+kidiqTable = read.table("kidiq.csv",header = TRUE,sep = ",", dec = ".")
+
+xAxis = kidiqTable$mom.iq
+yAxis = kidiqTable$kid.score
+modelForIQandScore = lm (yAxis ~ xAxis)
+
+ predict(modelForIQandScore, newdata = data.frame(xAxis = 110), interval = "confidence")
+# Mom.work is probably how much money mom makes. 4= the most, 1=the least
+n = length(kidiqTable[[1]])
+
+t_val = qt(p=0.025, df=432, lower.tail = FALSE)
+# summary(modelForIQandScore)
+sumOfSquareDev =   sum( (xAxis - mean(xAxis) )^2 )
+MSE = mean(modelForIQandScore$residuals^2)
+stanError = sqrt(MSE * (1/n + ((110 - mean(xAxis))^2 / sumOfSquareDev)))
+
+upperIntVal = 92.79 + t_val * stanError
+
+lowerIntVal = 92.79 - t_val * stanError
+# Both values match the R values generated by predict.
+
+# Q3 part b
+
+# t_val_partB = qt(p=0.975, df=432, lower.tail = TRUE)
+
+# t-Val same as in part a of Q3, when set alpha= 0.05
+
+t_val_partB = qt(p=0.995, df=432, lower.tail = TRUE)
+
+stanError_partB = sqrt(MSE * (1 + 1/n + ((110-mean(xAxis))^2 / sumOfSquareDev)))
+
+upperIntVal_partB = 92.79 + t_val_partB * stanError_partB
+
+lowerIntVal_partB = 92.79 - t_val_partB * stanError_partB
+
+print("For partB")
+predict(modelForIQandScore, newdata = data.frame(xAxis = 110), interval = "confidence", level = 0.99)
+
+
+# part C
+
+plot(modelForIQandScore)
+
+# The plot is definitely skewed towards the 0 on the x-axis.
+# Ask partner what this is supposed to mean?
